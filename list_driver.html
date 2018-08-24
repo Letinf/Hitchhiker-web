@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script src="js/vue.js"></script>
+		<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+		<link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css" />
+		<script language="JavaScript" src="js/jquery-1.11.3.min.js"></script>
+		<script language="JavaScript" src="js/bootstrap.min.js"></script>
+		<style type="text/css">
+			body {
+				font-family: "微软雅黑";
+			}
+			
+			.widge {
+				border-top: #31708F solid 2px;
+				padding-top: 10px;
+				margin-top: 5px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="jumbotron text-center" style="margin-bottom:0; background-color:#E7E7E7;">
+			<h1 style="font-family: '黑体';color: #004A80;">南航顺风车</h1>
+		</div>
+		<!--个人信息开始-->
+		<nav class="navbar navbar-inverse" style="background-color: #31708F;">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+					<a class="navbar-brand" href="#">个人信息</a>
+				</div>
+				<div class="collapse navbar-collapse" id="myNavbar">
+					<ul class="nav navbar-nav">
+						<li class="active">
+							<a href="#">当前订单</a>
+						</li>
+						<li>
+							<a href="#">消息<span class="badge">6</span></a>
+						</li>
+						<li>
+							<a href="#">历史订单</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<!--个人信息结束-->
+
+		<div class="container"  id="list_area">
+			<div class="row">
+				<!--左侧区域开始-->
+				<div class="col-sm-8">
+					<!--一个-->
+					<!--复用组件开始 -->
+					<div class="col-sm-12 col-md-6" v-for="item in list" v-if="item!==null">
+						<div class="thumbnail">
+							<div class="media">
+								<a class="media-left">
+									<img src="img/rabbit.jpg" width="100px" height="100px" alt="通用的占位符缩略图">
+								</a>
+								<div class="media-right">
+									<h3>{{item.name}}</h3>
+									<p>乘车人数：2</p>
+								</div>
+							</div>
+
+							<div class="widge">
+								<p><span class="glyphicon glyphicon-time" style="color: slategray;"></span> &nbsp;&nbsp;{{item.time}}
+								</p>
+								<p><span class="glyphicon glyphicon-send" style="color: mediumseagreen;"></span>&nbsp;&nbsp;{{item.startplace}}</p>
+								<p><span class="glyphicon glyphicon-send" style="color: coral;"></span>&nbsp;&nbsp;{{item.endplace}}</p>
+
+								<div class="row">
+									<div class="col-sm-9">
+										<a href="#" class="btn btn-primary" role="button" @click="clickEvent($event)">
+											我要接他
+										</a>
+									</div>
+
+									<div class="col-sm-3">
+										<h5 style="color:orange;">{{item.compatibility}}顺路</h5>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<!--复用组件结束-->
+				</div>
+				<!--左侧区域结束-->
+
+
+				<!--右侧区域开始-->
+				<div class="col-sm-4">
+					<h2>关于我</h2>
+					<h5>用户名:{{name}}</h5>
+					<div class="fakeimg">接单次数：3</div>
+					<h3>本次出行：</h3>
+					<p>出发地：{{driver_start}}</p>
+					<p>目的地：{{driver_end}}</p>
+					<ul class="nav nav-pills nav-stacked">
+						<li class="active">
+							<a href="#">联系客服</a>
+						</li>
+						<li>
+							<a href="#">取消订单</a>
+						</li>
+					</ul>
+					<hr class="hidden-sm hidden-md hidden-lg">
+				</div>
+				<!--右侧区域结束-->
+			</div>
+		</div>
+
+		<div class="jumbotron text-center" style="margin-bottom:0">
+			<h3>科技改变生活.....</h3>
+		</div>
+		
+		<script>
+			var driver_start=localStorage.dri_chu;
+			var driver_end=localStorage.dri_mu;
+			//	var username;
+			var index = location.href.indexOf('='); //等号在url的位置
+			var username = decodeURI(location.href).slice(index + 1); //获取到上一个页面的name
+			
+			new Vue({
+				el:'#list_area',
+					data:{
+					list:[],
+					name:username,
+					driver_start:driver_start,
+					driver_end:driver_end
+				},	
+				created:function(){
+					//1.0调用后台请求函数
+					this.getList();
+				},
+				methods:{
+					getList:function(){
+						var that=this;
+						$.get("http://172.20.10.2:8080/getpassenger",function(data,status){
+						    console.log("data:"+JSON.stringify(data));
+						 //  that.list=JSON.stringify(data);
+						 that.list=data;
+						});
+					},
+					clickEvent: function(e) {       //点击我要接他按钮的触发事件
+						var now = e.target;
+						//点击所选的出发和目的地
+						var passenger_name=now.parentNode.parentNode.parentNode.parentNode.children[0].children[1].children[0].innerText.trim();
+						var list_start = now.parentNode.parentNode.parentNode.children[1].innerText.trim();
+						var list_end = now.parentNode.parentNode.parentNode.children[2].innerText.trim();
+						
+						//把数据存储到localstorage
+						localStorage.setItem("passenger_name",passenger_name);
+						localStorage.setItem("driver_name",username);
+						localStorage.setItem("driver_start",driver_start);
+						localStorage.setItem("driver_end",driver_end);
+						localStorage.setItem("list_start",list_start);
+						localStorage.setItem("list_end",list_end);
+						//跳转到order页面
+						document.location.href = 'order2.html';
+						
+					}
+				}
+			});
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css" />
+		<link rel="stylesheet" href="https://cache.amap.com/lbs/static/AMap.DrivingRender1120.css" />
+		<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.8&key=e562ae0bf5383dc7d4ffe03e0e06f3cf&plugin=AMap.Autocomplete,AMap.Driving,AMap.Geocoder"></script>
+		<script type="text/javascript" src="https://cache.amap.com/lbs/static/DrivingRender1230.js"></script>
+		<script src="js/vue.js"></script>
+		<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+		<!--
+        	<link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css"/>
+        -->
+		<link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css" />
+		<script language="JavaScript" src="js/jquery-1.11.3.min.js"></script>
+		<script language="JavaScript" src="js/bootstrap.min.js"></script>
+		<script src="js/vue-router.js"></script>
+		<style type="text/css">
+			body {
+				font-family: "微软雅黑";
+			}
+			
+			.widge {
+				border-top: #31708F solid 2px;
+				padding-top: 10px;
+				margin-top: 5px;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<!--页面开始-->
+		<div class="jumbotron text-center" style="margin-bottom:0; background-color:#E7E7E7;">
+			<h1 style="font-family: '黑体';color: #004A80;">南航顺风车</h1>
+		</div>
+		<!--个人信息开始-->
+		<nav class="navbar navbar-inverse" style="background-color: #31708F;">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+					<a class="navbar-brand" href="#">个人信息</a>
+				</div>
+				<div class="collapse navbar-collapse" id="myNavbar">
+					<ul class="nav navbar-nav">
+						<li class="active">
+							<a href="#">当前订单</a>
+						</li>
+						<li>
+							<a href="#">消息<span class="badge">6</span></a>
+						</li>
+						<li>
+							<a href="#">历史订单</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<!--个人信息结束-->
+
+		<div class="container" id="list_area">
+
+			<div class="row">
+				<!--左侧区域开始-->
+				<div class="col-sm-8">
+					<h2>订单轨迹</h2>
+					<div id="map_container" style="height: 300px;margin-top: 10px;margin-bottom: 10px;border:3px solid #a1a1a1;border-radius:10px;"></div>
+
+				</div>
+				<!--左侧区域结束-->
+
+				<!--右侧区域开始-->
+				<div class="col-sm-4">
+					<h2>关于我</h2>
+					<h5>用户名:{{driver_name}}</h5>
+					<p>本次出发地：{{driver_start}}</p>
+					<p>本次目的地：{{driver_end}}</p>
+					<h3>同行乘客信息：</h3>
+					<p>乘客昵称：{{passenger_name}}</p>
+					<p>乘客出发地：{{list_start}}</p>
+					<p>乘客目的地：{{list_end}}</p>
+					<ul class="nav nav-pills nav-stacked">
+						<li class="active">
+							<a href="#">联系乘客</a>
+						</li>
+						<li>
+							<a href="#">取消订单</a>
+						</li>
+					</ul>
+					<hr class="hidden-sm hidden-md hidden-lg">
+				</div>
+				<!--右侧区域结束-->
+			</div>
+
+		</div>
+
+		<div class="jumbotron text-center" style="margin-bottom:0">
+			<h3>科技改变生活.....</h3>
+		</div>
+
+		<script>
+			var passenger_name = localStorage.getItem('passenger_name');
+			var driver_name = localStorage.getItem('driver_name');
+			var driver_start = localStorage.getItem('driver_start');
+			var driver_end = localStorage.getItem('driver_end');
+			var list_start = localStorage.getItem('list_start');
+			var list_end = localStorage.getItem('list_end');
+			new Vue({
+				el: '#list_area',
+				data: {
+					driver_name: driver_name,
+					passenger_name: passenger_name,
+					driver_start: driver_start,
+					driver_end: driver_end,
+					list_start:list_start,
+					list_end:list_end
+				}
+			});
+			//初始化地图
+			var map = new AMap.Map("map_container", {
+				resizeEnable: true
+			});
+
+			// 根据起终点名称规划驾车导航路线
+
+			AMap.plugin('AMap.Driving', function() {
+				var driving = new AMap.Driving({
+					// 驾车路线规划策略，AMap.DrivingPolicy.LEAST_TIME是最快捷模式
+					policy: AMap.DrivingPolicy.LEAST_TIME,
+					map: map
+				})
+
+				var points = [{
+						keyword: driver_start,      //起点
+						city: '广州'
+					},
+					{
+						keyword: list_start,          //途径点1
+						city: '广州'
+					},
+					{
+						keyword: list_end,        //途径点2
+						city: '广州'
+					},
+					{
+						keyword: driver_end,        //终点
+						city: '广州'
+					}
+				];
+				
+				driving.search(points);
+			})
+		</script>
+	</body>
+
+</html>

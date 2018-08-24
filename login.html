@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>登陆界面</title>
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<link rel="stylesheet" type="text/css" href="css/body.css"/> 
+<script language="JavaScript" src="js/jquery-1.11.3.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+	<section id="content">
+		<div class="oook">
+			<h1>顺风车会员登陆</h1>
+			<div>
+				<input type="text" placeholder="用户账号" id="username" required=""/>
+			</div>
+			
+			 <div class="">
+				<span class="help-block u-errormessage" id="js-server-helpinfo">&nbsp;</span>			</div> 
+			<div>
+				<!-- <input type="submit" value="Log in" /> -->
+				<input type="submit" value="登录" class="mybutton" id="js-btn-login" onclick="tiaozhuan()"/>
+				
+				<!-- <a href="#">Register</a> -->
+			</div>
+			</div>
+		<!-- form -->
+		 <div class="button">
+			<span class="help-block u-errormessage" id="js-server-helpinfo">&nbsp;</span>
+			<a href="#">联系客服</a>	
+		</div> <!-- button -->
+	</section><!-- content -->
+</div>
+<!-- container -->
+<script type="text/javascript">
+	
+	var tiaozhuan = function(){
+		var name=$("#username").val();
+				//document.location.href ='index.html?username='+$("#username").val() ;
+          $.get("http://172.20.10.2:8080/login/name?name="+name,function(data,status){
+    //alert("Data: " + data + "\nStatus: " + status);
+    if(data=='YES'){
+    	alert("登陆成功！！");
+    	document.location.href ='index.html?username='+encodeURI(name);
+    }else if(data=='NO'){
+    	alert("用户未注册！！");
+    	location.reload();
+    }else{
+    	alert("其他原因："+data);
+    }
+  });
+	}
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+
+		<title></title>
+		<link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css" />
+		<link rel="stylesheet" href="https://cache.amap.com/lbs/static/AMap.DrivingRender1120.css" />
+
+		<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.8&key=e562ae0bf5383dc7d4ffe03e0e06f3cf&plugin=AMap.Autocomplete,AMap.Driving,AMap.Geocoder"></script>
+
+		<script type="text/javascript" src="https://cache.amap.com/lbs/static/DrivingRender1230.js"></script>
+		<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+		<script language="JavaScript" src="js/jquery-1.11.3.min.js"></script>
+		<script language="JavaScript" src="js/bootstrap.min.js"></script>
+		<link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen" />
+		<script type="text/javascript" src="js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+	</head>
+
+	<body>
+
+		<div class="container">
+
+			<h1 style="margin-left: 10px;">南航顺风车</h1>
+			<ul id="myTab" class="nav nav-tabs">
+				<li class="active">
+					<a href="#home" data-toggle="tab">
+						我是乘客
+					</a>
+				</li>
+				<li>
+					<a href="#ios" data-toggle="tab">车主</a>
+				</li>
+			</ul>
+			<div id="myTabContent" class="tab-content">
+				<div class="tab-pane fade in active" id="home">
+					<div class="jumbotron">
+						<div style="padding: 50px 100px 100px 10px;">
+							<div class="input-group">
+								<span class="input-group-addon">出发地</span>
+								<input type="text" class="form-control" id="ck_cfd">
+							</div>
+							<br />
+							<div class="input-group">
+								<span class="input-group-addon">目的地</span>
+								<input type="text" class="form-control" id="ck_mdd">
+							</div>
+							<!--地图显示 -->
+							<div class="col-lg-12">
+								<div id="map_container" style="height: 300px;margin-top: 10px;margin-bottom: 10px;border:3px solid #a1a1a1;border-radius:10px;"></div>
+							</div>
+							<!--出发时间和乘客人数-->
+							<div class="row" style="margin-top: 30px;">
+								<div class="col-lg-6">
+									<div class="input-group">
+										<span class="input-group-addon">最早出发时间</span>
+										<input type="text" class="form-control form_datetime" placeholder="select time" id="ck_early_time">
+									</div>
+								</div>
+
+								<div class="col-lg-6">
+									<div class="input-group">
+										<span class="input-group-addon">最晚出发时间</span>
+										<input type="text" class="form-control form_datetime" placeholder="select time" id="ck_last_time">
+									</div>
+								</div>
+
+								<div class="col-lg-6" style="margin-top: 10px;">
+									<div class="input-group">
+										<span class="input-group-addon">乘坐人数</span>
+										<input type="text" class="form-control " placeholder="直接输入人数" id="ck_num" onkeyup="value=value.replace(/[^\d]/g,'')">
+									</div>
+								</div>
+
+							</div>
+
+						</div>
+						<p>
+							<a class="btn btn-primary btn-lg" role="button" style="margin-left: 10px;" onclick="send()">发布订单</a>
+						</p>
+					</div>
+				</div>
+				<!--司机页
+                -->
+				<div class="tab-pane fade" id="ios">
+					<div class="jumbotron">
+
+						<div style="padding: 50px 100px 100px 10px;">
+							<div class="input-group">
+								<span class="input-group-addon">出发地</span>
+								<input type="text" class="form-control" id="sj_cfd">
+							</div>
+							<br />
+							<div class="input-group">
+								<span class="input-group-addon">目的地</span>
+								<input type="text" class="form-control" id="sj_mdd">
+							</div>
+							<!--地图 -->
+							<div class="col-lg-12">
+								<div id="sj_map_container" style="height: 300px;margin-bottom: 10px;margin-top: 10px;border:3px solid #a1a1a1;border-radius:10px;"></div>
+							</div>
+							<div class="row" style="margin-top: 30px;">
+								<div class="col-lg-6">
+									<div class="input-group">
+										<span class="input-group-addon">最早出发时间</span>
+										<input type="text" class="form-control form_datetime" placeholder="select time" id="sj_early_time">
+									</div>
+								</div>
+
+								<div class="col-lg-6">
+									<div class="input-group">
+										<span class="input-group-addon">最晚出发时间</span>
+										<input type="text" class="form-control form_datetime" placeholder="select time" id="sj_last_time">
+									</div>
+								</div>
+
+								<div class="col-lg-6" style="margin-top: 10px;">
+									<div class="input-group">
+										<span class="input-group-addon">乘坐人数</span>
+										<input type="text" class="form-control " placeholder="直接输入人数" id="sj_num" onkeyup="value=value.replace(/[^\d]/g,'')">
+									</div>
+								</div>
+							</div>
+
+						</div>
+						<p>
+							<a class="btn btn-primary btn-lg" role="button" style="margin-left: 10px;" onclick="check()">查看订单</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			var ck_cfd;
+			var ck_mdd;
+			var sj_cfd;
+			var sj_mdd;
+			//	var username;
+			var index = location.href.indexOf('='); //等号在url的位置
+			var username = decodeURI(location.href).slice(index + 1); //获取到上一个页面的name
+
+			var jwd = new Array();
+
+			var map = new AMap.Map("map_container", {
+				resizeEnable: true
+			});
+			var sj_map = new AMap.Map("sj_map_container", {
+				resizeEnable: true
+			});
+			//输入提示
+			var auto1 = new AMap.Autocomplete({
+				input: "ck_cfd",
+				city: "广州"
+			});
+			var auto2 = new AMap.Autocomplete({
+				input: "ck_mdd",
+				city: "广州"
+			});
+			var auto3 = new AMap.Autocomplete({
+				input: "sj_cfd",
+				city: "广州"
+			});
+			var auto4 = new AMap.Autocomplete({
+				input: "sj_mdd",
+				city: "广州"
+			});
+
+			function send() {
+
+				ck_cfd = $("#ck_cfd").val(); //中文的地标名
+				ck_mdd = $("#ck_mdd").val();
+				var early_time = $("#ck_early_time").val();
+				var last_time = $("#ck_last_time").val();
+				var num = $("#ck_num").val();
+
+				//回调函数
+				geocoder(ck_cfd, ck_mdd);
+				
+				window.getjw = function(jwd) {
+					//					console.log("乘客出发地坐标:" + jwd[0] + "," + jwd[1] + "乘客目的地坐标:" + jwd[2] + "," + jwd[3]);
+					//					console.log("乘客出发地是：" + ck_cfd + '\n' + "乘客目的地是：" + ck_mdd + '\n' + "乘客最早出发时间：" + early_time + "乘客最晚出发时间" + last_time + "乘坐人数：" + num);
+					//					//封装为json
+					var con = {};
+					con["startPlace"] = ck_cfd;
+					con["endPlate"] = ck_mdd;
+					con["startPosition1"] = jwd[0];
+					con["startPosition2"] = jwd[1];
+					con["endPosition1"] = jwd[2];
+					con["endPosition2"] = jwd[3];
+					con["departureTimeFrom"] = early_time;
+					con["departureTimeTo"] = last_time;
+					con["seats"] = num;
+					var json = JSON.stringify(con);
+					console.log("乘客封装成json数据为：" + json);
+					//发送给后台
+					$.ajax({
+						type: 'POST',
+						data: json, //json
+						contentType: 'application/json',
+						dataType: 'json',
+						url: 'http://172.20.10.2:8080/api/passenger/trip',
+						success: function(data) {
+							alert("发送成功");
+							localStorage.pa_chu=ck_cfd;
+							localStorage.pa_mu=ck_mdd;
+							document.location.href = 'list.html?username=' + username;
+						},
+						error: function(e) {
+							alert("发送失败");
+						}
+					});
+
+				}
+
+			}
+			//防止geocoder里getLocation函数异步执行
+			function pig(mdd) {
+				var lat, lng;
+
+				var geocoder = new AMap.Geocoder({
+					city: "020", //城市，默认：“全国”
+					radius: 1000 //范围，默认：500
+				});
+				//地理编码,返回地理编码结果
+
+				geocoder.getLocation(mdd, function(status, result) {
+					if(status === 'complete' && result.info === 'OK') {
+						//地理编码结果数组
+						var geocode = result.geocodes;
+						for(var i = 0; i < geocode.length; i++) {
+							lat = geocode[i].location.getLat();
+							lng = geocode[i].location.getLng();
+							//console.log("坐标：" + lat + ", " + lng);
+							jwd[2] = lat, jwd[3] = lng;
+							getjw(jwd);
+						}
+					}
+
+				});
+
+			}
+			//通过关键字算出坐标 
+
+			function geocoder(cfd, mdd) {
+				var lat, lng;
+
+				var geocoder = new AMap.Geocoder({
+					city: "020", //城市，默认：“全国”
+					radius: 1000 //范围，默认：500
+				});
+				//地理编码,返回地理编码结果
+				geocoder.getLocation(cfd, function(status, result) {
+					if(status === 'complete' && result.info === 'OK') {
+						//地理编码结果数组
+						var geocode = result.geocodes;
+						for(var i = 0; i < geocode.length; i++) {
+							lat = geocode[i].location.getLat();
+							lng = geocode[i].location.getLng();
+							//console.log("坐标：" + lat + ", " + lng);
+							jwd[0] = lat, jwd[1] = lng;
+							pig(mdd);
+						}
+					}
+
+				});
+			}
+
+			function check() {
+				sj_cfd = $("#sj_cfd").val();
+				sj_mdd = $("#sj_mdd").val();
+				var early_time = $("#sj_early_time").val();
+				var last_time = $("#sj_last_time").val();
+				var num = $("#sj_num").val();
+				//司机回调函数
+				geocoder(sj_cfd, sj_mdd);
+				getjw = function(jwd) {
+					//					console.log("司机出发地坐标:" + jwd[0] + "," + jwd[1] + "司机目的地坐标:" + jwd[2] + "," + jwd[3]);
+					//					console.log("车主出发地是：" + sj_cfd + '\n' + "车主目的地是：" + sj_mdd + '\n' + "车主最早出发时间为：" + early_time + "车主最晚出发时间为" + last_time);
+					//车主包装为json
+					var con = {};
+					con["startPlace"] = sj_cfd;
+					con["endPlate"] = sj_mdd;
+					con["startPosition1"] = jwd[0];
+					con["startPosition2"] = jwd[1];
+					con["endPosition1"] = jwd[2];
+					con["endPosition2"] = jwd[3];
+					con["departureTimeFrom"] = early_time;
+					con["departureTimeTo"] = last_time;
+					con["seats"] = num;
+					var json = JSON.stringify(con);
+					console.log("司机封装成json数据为：" + json);
+					//发送给后台
+					$.ajax({
+						type: 'POST',
+						data: json, //json
+						contentType: 'application/json',
+						dataType: 'json',
+						url: 'http://172.20.10.2:8080/api/driver/trip',
+						success: function(data) {
+							alert("发送成功");
+							localStorage.dri_chu=sj_cfd;
+							localStorage.dri_mu=sj_mdd;
+							document.location.href = 'list_driver.html?username=' + username;
+						},
+						error: function(e) {
+							alert("发送失败");
+						}
+					});
+
+				}
+
+			}
+			//日期插件
+			$(".form_datetime").datetimepicker({
+				format: 'yyyy-mm-dd hh:ii', //显示格式
+				todayHighlight: 1, //今天高亮
+				minView: "hour", //设置只显示到小时
+				startView: 2,
+				forceParse: 0,
+				showMeridian: 1,
+				autoclose: 1 //选择后自动关闭
+			});
+			//延迟7秒后查询
+			$("#ck_mdd").focus(function() {
+				setTimeout("showRoute()", 7000);
+			});
+			$("#sj_mdd").focus(function() {
+				setTimeout("showSjRoute()", 7000);
+			})
+
+			//驾车导航，您如果想修改结果展现效果，请参考页面：https://lbs.amap.com/fn/css-style/
+			var drivingOption = {
+				policy: AMap.DrivingPolicy.LEAST_TIME
+			};
+			var driving = new AMap.Driving(drivingOption); //构造驾车导航类
+			//根据起终点坐标规划驾车路线
+
+			//5s后的函数
+			function showRoute() {
+				ck_cfd = $("#ck_cfd").val();
+				ck_mdd = $("#ck_mdd").val();
+
+				//开始查询
+				driving.search([{
+					keyword: ck_cfd
+				}, {
+					keyword: ck_mdd
+				}], function(status, result) {
+					if(status === 'complete' && result.info === 'OK') {
+						(new Lib.AMap.DrivingRender()).autoRender({
+							data: result,
+							map: map
+						});
+					} else {
+						//alert(result);
+					}
+				});
+			}
+
+			function showSjRoute() {
+				sj_cfd = $("#sj_cfd").val();
+				sj_mdd = $("#sj_mdd").val();
+
+				//开始查询
+				driving.search([{
+					keyword: sj_cfd
+				}, {
+					keyword: sj_mdd
+				}], function(status, result) {
+					if(status === 'complete' && result.info === 'OK') {
+						(new Lib.AMap.DrivingRender()).autoRender({
+							data: result,
+							map: sj_map
+						});
+					} else {
+						console.log("轨迹不成功原因：" + result);
+					}
+				});
+			}
+		</script>
+
+	</body>
+
+</html>
